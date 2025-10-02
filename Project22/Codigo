@@ -1,0 +1,185 @@
+#include "pch.h"
+#include <iostream>
+#include <vector>
+#include <string>
+#include <iomanip>
+
+using namespace std;
+
+class Producto {
+private:
+    string nombre;
+    double precio;
+public:
+    Producto(const string& n = "", double p = 0.0) : nombre(n), precio(p) {}
+    string getNombre() const { return nombre; }
+    double getPrecio() const { return precio; }
+};
+
+class Usuario {
+private:
+    string nombre;
+    string telefono;
+public:
+    Usuario(const string& n = "", const string& t = "") : nombre(n), telefono(t) {}
+    string getNombre() const { return nombre; }
+    string getTelefono() const { return telefono; }
+};
+
+class Historia {
+private:
+    vector<string> pedidos;
+public:
+    void agregarPedido(const string& desc) { pedidos.push_back(desc); }
+    void mostrarPedidos() const {
+        cout << "\n=== Historial de pedidos ===\n";
+        if (pedidos.empty()) { cout << "(No hay pedidos todavía)\n"; return; }
+        for (size_t i = 0; i < pedidos.size(); ++i) {
+            cout << i + 1 << ") " << pedidos[i] << "\n";
+        }
+    }
+};
+
+class Inventario {
+public:
+    vector<Producto> productos;
+
+    void agregarProducto(const Producto& p) { productos.push_back(p); }
+
+    void mostrarProductos() const {
+        cout << "\n=== Inventario ===\n";
+        if (productos.empty()) { cout << "(Inventario vacío)\n"; return; }
+        for (size_t i = 0; i < productos.size(); ++i) {
+            cout << i + 1 << ") " << productos[i].getNombre()
+                << " - S/ " << fixed << setprecision(2) << productos[i].getPrecio() << "\n";
+        }
+    }
+
+    // Ordena productos por precio (ascendente) usando quicksort (requisito E)
+    void ordenarPorPrecio() {
+        if (productos.size() > 1) quicksort(0, (int)productos.size() - 1);
+    }
+
+private:
+    void quicksort(int low, int high) {
+        int i = low, j = high;
+        double pivot = productos[(low + high) / 2].getPrecio();
+        while (i <= j) {
+            while (productos[i].getPrecio() < pivot) ++i;
+            while (productos[j].getPrecio() > pivot) --j;
+            if (i <= j) {
+                swap(productos[i], productos[j]);
+                ++i;
+                --j;
+            }
+        }
+        if (low < j) quicksort(low, j);
+        if (i < high) quicksort(i, high);
+    }
+};
+
+// Función para crear un pedido simple (elige productos por índice)
+void hacerPedido(Inventario& inv, Historia& hist) {
+    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // limpiar buffer
+    string cliente;
+    cout << "\nNombre del cliente: ";
+    getline(cin, cliente);
+
+    if (inv.productos.empty()) {
+        cout << "No hay productos en el inventario.\n";
+        return;
+    }
+
+    vector<Producto> itemsPedido;
+    while (true) {
+        inv.mostrarProductos();
+        cout << "Selecciona número de producto para agregar (0 para terminar): ";
+        int idx;
+        if (!(cin >> idx)) { // entrada inválida
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Entrada inválida. Intenta otra vez.\n";
+            continue;
+        }
+        if (idx == 0) break;
+        if (idx < 1 || idx >(int)inv.productos.size()) {
+            cout << "Índice fuera de rango. Intenta otra vez.\n";
+            continue;
+        }
+        cout << "Cantidad: ";
+        int qty;
+        if (!(cin >> qty) || qty <= 0) { cin.clear(); cin.ignore(numeric_limits<streamsize>::max(), '\n'); cout << "Cantidad inválida.\n"; continue; }
+        for (int k = 0; k < qty; ++k) itemsPedido.push_back(inv.productos[idx - 1]);
+        cout << "Producto(s) agregado(s).\n";
+    }
+
+    if (itemsPedido.empty()) {
+        cout << "Pedido vacío. No se guardó.\n";
+        return;
+    }
+
+    double total = 0.0;
+    string descripcion = "Cliente: " + cliente + " | Items: ";
+    for (size_t i = 0; i < itemsPedido.size(); ++i) {
+        descripcion += itemsPedido[i].getNombre();
+        if (i + 1 < itemsPedido.size()) descripcion += ", ";
+        total += itemsPedido[i].getPrecio();
+    }
+    descripcion += " | Total S/ " + to_string((long double)total);
+
+    hist.agregarPedido(descripcion);
+    cout << "\nPedido guardado en historial:\n" << descripcion << "\n";
+}
+
+int main() {
+    Inventario inv;
+    Historia hist;
+
+    // Semilla de productos
+    inv.agregarProducto(Producto("Pizza Margarita", 20.0));
+    inv.agregarProducto(Producto("Pizza Pepperoni", 24.0));
+    inv.agregarProducto(Producto("Pizza Hawaiana", 23.0));
+    inv.agregarProducto(Producto("Papas Fritas", 6.0));
+    inv.agregarProducto(Producto("Gaseosa 1L", 5.0));
+
+    int opcion = 0;
+    while (true) {
+        cout << "\n===== MENU PRINCIPAL =====\n";
+        cout << "1) Ver inventario\n";
+        cout << "2) Ordenar inventario por precio (quicksort)\n";
+        cout << "3) Hacer pedido\n";
+        cout << "4) Ver historial de pedidos\n";
+        cout << "5) Salir\n";
+        cout << "Elige una opcion: ";
+        if (!(cin >> opcion)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Entrada invalida. Intenta otra vez.\n";
+            continue;
+        }
+
+        if (opcion == 1) {
+            inv.mostrarProductos();
+        }
+        else if (opcion == 2) {
+            inv.ordenarPorPrecio();
+            cout << "Inventario ordenado por precio (ascendente).\n";
+            inv.mostrarProductos();
+        }
+        else if (opcion == 3) {
+            hacerPedido(inv, hist);
+        }
+        else if (opcion == 4) {
+            hist.mostrarPedidos();
+        }
+        else if (opcion == 5) {
+            cout << "Saliendo. ¡Hasta luego!\n";
+            break;
+        }
+        else {
+            cout << "Opcion no valida. Intenta otra vez.\n";
+        }
+    }
+
+    return 0;
+}
