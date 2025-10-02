@@ -4,7 +4,7 @@
 #include <vector>
 #include "Producto.h"
 using namespace std;
-
+using namespace System;
 class Pedido {
 private:
     vector<Producto> productos;
