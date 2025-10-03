@@ -113,13 +113,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AppManager.cpp" />
+    <ClCompile Include="GestorArchivos.cpp" />
+    <ClCompile Include="MenuUI.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Acompanamiento.h" />
     <ClInclude Include="AppManager.h" />
+    <ClInclude Include="Bebida.h" />
     <ClInclude Include="Cliente.h" />
+    <ClInclude Include="Combo.h" />
     <ClInclude Include="GestorArchivos.h" />
+    <ClInclude Include="Ingrediente.h" />
     <ClInclude Include="MenuUI.h" />
+    <ClInclude Include="Pedido.h" />
+    <ClInclude Include="Pizza.h" />
+    <ClInclude Include="Producto.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

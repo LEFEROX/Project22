@@ -1,7 +1,7 @@
-#include "iostream"
-#include "MenuUI.h"
-#include "Cliente.h"
+#include "AppManager.h"
 
-using namespace System;
-using namespace std;
-
+int main() {
+    AppManager pizzaHutApp;
+    pizzaHutApp.iniciar();
+    return 0;
+}

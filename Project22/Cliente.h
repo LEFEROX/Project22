@@ -21,6 +21,8 @@ public:
 
     string getDNI() const { return dni; }
     string getNombreCompleto() const { return nombreCompleto; }
+    string getDireccion() const { return direccion; } 
+    string getTelefono() const { return telefono; }   
 
 };
 
